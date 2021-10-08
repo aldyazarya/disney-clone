@@ -1,14 +1,12 @@
-import {GraphQLClient} from 'graphql-request'
+import { GraphQLClient } from "graphql-request";
 
+export default async ({ body }, res) => {
+  const graphcms = new GraphQLClient(process.env.ENDPOINT, {
+    headers: { Authorization: process.env.GRAPH_CMS_TOKEN },
+  });
 
-export default  async ( { body}, res) => {
-
-    const graphcms = new GraphQLClient(process.env.ENDPOINT, {
-        headers: { "Authorization" : process.env.GRAPH_CMS_TOKEN}
-    })
-
-    await graphcms.request(
-        `
+  await graphcms.request(
+    `
         mutation($slug: String!) {
             updateVideo(where:
                 { slug: $slug},
@@ -19,22 +17,18 @@ export default  async ( { body}, res) => {
               seen
             }
           }
-        `
-        ,
-        { slug: body.slug}
-    )
+        `,
+    { slug: body.slug }
+  );
 
-    await graphcms.request(
-        `mutation publishVideo($slug: String) {
+  await graphcms.request(
+    `mutation publishVideo($slug: String) {
         publishVideo(where: { slug: $slug}, to: PUBLISHED) {
             slug
             }
         }`,
-        { slug: body.slug }
-    )
+    { slug: body.slug }
+  );
 
-
-
-
-    res.status(201).json({ slug: body.slug })
-}
+  res.status(201).json({ slug: body.slug });
+};
